@@ -6,5 +6,4 @@ This projects aims at developing a common city cycle sharing system where citize
 
 1. A client side app
 2. An IOT device to be installed on cycles
-3. A server where all monitoring software and processes will take place
 
