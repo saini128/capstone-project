@@ -1,20 +1,29 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:client_app/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_svg/flutter_svg.dart';
 
+// ignore: must_be_immutable
 class DashboardPage extends StatefulWidget {
   final String name;
   int dueAmount;
   bool isRentingCycle;
+  final Color overlayColor;
+  final double opacity;
+  final Color progressIndicatorColor;
 
   DashboardPage({
     Key? key,
     required this.name,
     required this.dueAmount,
     this.isRentingCycle = false,
+    this.overlayColor = Colors.grey,
+    this.opacity = 0.7,
+    this.progressIndicatorColor = Colors.white,
   }) : super(key: key);
 
   @override
@@ -22,9 +31,9 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  String _scanBarcode = 'Unknown';
+  //String _scanBarcode = 'Unknown';
   bool _dataFetched = false;
-  bool _donescanning = true;
+  bool _scanning = false;
 
   @override
   void initState() {
@@ -37,7 +46,7 @@ class _DashboardPageState extends State<DashboardPage> {
     try {
       final response = await http.get(
         Uri.parse(
-          'https://api.thingspeak.com/channels/2304645/fields/1.json?results=1',
+          'https://api.thingspeak.com/channels/2304645/fields/1.json?results=2',
         ),
       );
 
@@ -48,6 +57,7 @@ class _DashboardPageState extends State<DashboardPage> {
           final field1Value = lastEntry['field1'];
           setState(() {
             widget.isRentingCycle = (field1Value == '1');
+            print('FIeld 1 Value = ' + field1Value);
             _dataFetched = true;
           });
         }
@@ -59,12 +69,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<void> scanQR() async {
     String barcodeScanRes;
-    if (!_donescanning) return; // Avoid multiple scan attempts
+    //if (!_scanning) return; // Avoid multiple scan attempts
     //await Future.delayed(Duration(seconds: 2));
-    setState(() {
-      _donescanning = false; // Mark that scanning is in progress
-    });
 
+    _scanning = true; // Mark that scanning is in progress
+    setState(() {});
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
         '#ff6666',
@@ -78,11 +87,17 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     if (!mounted) return;
+    // if (barcodeScanRes != "68354") {
+    //   setState(() async {
+    //     _scanning = true;
+    //   });
+    //   print('QR Code not correct');
+    //   return;
+    // }
+    // else
 
-    setState(() async {
-      _donescanning = true;
+    if (barcodeScanRes == "68354") {
       Uri url;
-      _scanBarcode = barcodeScanRes;
       if (widget.isRentingCycle) {
         url = Uri.parse(
           'https://api.thingspeak.com/update?api_key=O6Q91SERUAB4JDIF&field1=0',
@@ -97,50 +112,251 @@ class _DashboardPageState extends State<DashboardPage> {
 
       if (response.statusCode == 200) {
         print('Data sent to ThingSpeak: ${!widget.isRentingCycle}');
+        setState(() {
+          widget.isRentingCycle =
+              !widget.isRentingCycle; // Update the isRentingCycle
+        });
       } else {
         print('Failed to send data to ThingSpeak');
       }
+    } else
+      print('wrong QR');
+    _scanning = false;
+  }
 
-      setState(() {
-        widget.isRentingCycle =
-            !widget.isRentingCycle; // Update the isRentingCycle
-      });
-    });
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  void openDrawer() {
+    _scaffoldKey.currentState!.openDrawer();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 241, 244, 248),
+      key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Dashboard'),
+        backgroundColor: Color.fromARGB(255, 241, 244, 248),
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.menu,
+            color: Colors.black,
+          ),
+          onPressed: openDrawer,
+        ),
       ),
-      body: Center(
-        child: (_dataFetched && _donescanning)
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'Welcome, ${widget.name}',
-                    style: TextStyle(fontSize: 24),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            ListTile(
+              title: Text("Menu Item 1"),
+              onTap: () {
+                // Handle menu item 1 click
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text("Menu Item 2"),
+              onTap: () {
+                // Handle menu item 2 click
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+      body: SafeArea(
+        top: true,
+        child: SingleChildScrollView(
+          child: Stack(children: <Widget>[
+            if (!_dataFetched || _scanning)
+              Container(
+                alignment: Alignment.center,
+                height: 600,
+                color: widget.overlayColor.withOpacity(widget.opacity),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        widget.progressIndicatorColor),
                   ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Current Status: ${widget.isRentingCycle ? "Rented" : "Not Rented"}',
-                    style: TextStyle(fontSize: 20),
+                ),
+              ),
+            Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                const Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                        child: Text(
+                          'Welcome,',
+                          style: TextStyle(
+                              fontSize: 32, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Due: \$${widget.dueAmount.toStringAsFixed(2)}',
-                    style: TextStyle(fontSize: 20),
+                ),
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                        child: Text('Hushraj Singh',
+                            style: TextStyle(
+                              fontFamily: 'Outfit',
+                              color: kPrimaryColor,
+                              fontSize: 48,
+                              fontWeight: FontWeight.w700,
+                            )),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: scanQR, // Call the scanQR method
-                    child: Text('Scan QR Code'),
+                ),
+                const Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Icon(
+                        Icons.pin_drop,
+                        color: Color.fromARGB(255, 63, 63, 63),
+                      ),
+                      Padding(
+                        padding: EdgeInsetsDirectional.fromSTEB(8, 8, 8, 8),
+                        child: Text(
+                          'Patiala, Punjab',
+                          style: TextStyle(
+                              color: Color.fromARGB(255, 63, 63, 63),
+                              fontSize: 20),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              )
-            : CircularProgressIndicator(), // Show a loading indicator until data is fetched
+                ),
+                Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Card(
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        color: !_dataFetched || _scanning
+                            ? widget.overlayColor.withOpacity(widget.opacity)
+                            : Color.fromARGB(255, 244, 244, 244),
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Due: \$100.00', // Replace with your actual amount due
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              Container(
+                                width: 300,
+                                child: Text(
+                                  (widget.isRentingCycle
+                                      ? 'Cycle Status: Rented'
+                                      : 'Cycle Status: Not Rented'), // Replace with your actual cycle status
+                                  style: TextStyle(
+                                    fontSize: 25,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          scanQR();
+                          _scanning = true;
+                          //setState(() {});
+                        },
+                        child: Card(
+                          clipBehavior: Clip.antiAliasWithSaveLayer,
+                          // color: Color.fromARGB(255, 244, 244, 244),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Container(
+                            height: 80,
+                            width: 80,
+                            color: !_dataFetched || _scanning
+                                ? widget.overlayColor
+                                    .withOpacity(widget.opacity)
+                                : Color.fromARGB(255, 244, 233, 255),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14.0),
+                              child: SvgPicture.asset("assets/images/qr.svg"),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 50),
+                      GestureDetector(
+                        onTap: () {
+                          getInitialRentingStatus();
+                          setState(() {});
+                        },
+                        child: Card(
+                          clipBehavior: Clip.antiAliasWithSaveLayer,
+                          // color: Color.fromARGB(255, 244, 244, 244),
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Container(
+                            height: 80,
+                            width: 80,
+                            color: !_dataFetched || _scanning
+                                ? widget.overlayColor
+                                    .withOpacity(widget.opacity)
+                                : Color.fromARGB(255, 244, 233, 255),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14.0),
+                              child:
+                                  SvgPicture.asset("assets/images/rupee.svg"),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ]),
+        ),
       ),
     );
   }
