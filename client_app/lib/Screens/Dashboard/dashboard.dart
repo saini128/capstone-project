@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:client_app/components/transaction_card.dart';
 import 'package:client_app/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -87,14 +88,6 @@ class _DashboardPageState extends State<DashboardPage> {
     }
 
     if (!mounted) return;
-    // if (barcodeScanRes != "68354") {
-    //   setState(() async {
-    //     _scanning = true;
-    //   });
-    //   print('QR Code not correct');
-    //   return;
-    // }
-    // else
 
     if (barcodeScanRes == "68354") {
       Uri url;
@@ -239,59 +232,55 @@ class _DashboardPageState extends State<DashboardPage> {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Card(
-                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                        color: !_dataFetched || _scanning
-                            ? widget.overlayColor.withOpacity(widget.opacity)
-                            : Color.fromARGB(255, 244, 244, 244),
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 20),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Due: \$100.00', // Replace with your actual amount due
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Card(
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      color: !_dataFetched || _scanning
+                          ? widget.overlayColor.withOpacity(widget.opacity)
+                          : Color.fromARGB(255, 244, 244, 244),
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Due: \$100.00', // Replace with your actual amount due
+                              style: TextStyle(
+                                fontSize: 25,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Container(
+                              width: 300,
+                              child: Text(
+                                (widget.isRentingCycle
+                                    ? 'Cycle Status: Rented'
+                                    : 'Cycle Status: Not Rented'), // Replace with your actual cycle status
                                 style: TextStyle(
-                                  fontSize: 30,
+                                  fontSize: 25,
                                   color: Colors.black,
                                 ),
                               ),
-                              SizedBox(height: 20),
-                              Container(
-                                width: 300,
-                                child: Text(
-                                  (widget.isRentingCycle
-                                      ? 'Cycle Status: Rented'
-                                      : 'Cycle Status: Not Rented'), // Replace with your actual cycle status
-                                  style: TextStyle(
-                                    fontSize: 25,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 20),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 20),
+                  padding: EdgeInsets.only(top: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -309,8 +298,8 @@ class _DashboardPageState extends State<DashboardPage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Container(
-                            height: 80,
-                            width: 80,
+                            height: 70,
+                            width: 70,
                             color: !_dataFetched || _scanning
                                 ? widget.overlayColor
                                     .withOpacity(widget.opacity)
@@ -336,8 +325,8 @@ class _DashboardPageState extends State<DashboardPage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Container(
-                            height: 80,
-                            width: 80,
+                            height: 70,
+                            width: 70,
                             color: !_dataFetched || _scanning
                                 ? widget.overlayColor
                                     .withOpacity(widget.opacity)
@@ -353,6 +342,40 @@ class _DashboardPageState extends State<DashboardPage> {
                     ],
                   ),
                 ),
+                Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    child: Container(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Ride Details',
+                          style: TextStyle(
+                              fontSize: 32, fontWeight: FontWeight.w500),
+                        ))),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: TransactionCard(
+                      inprogress: false, start: DateTime(2023, 10, 16, 9, 0)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: TransactionCard(
+                      inprogress: false, start: DateTime(2023, 10, 16, 9, 0)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: TransactionCard(
+                      inprogress: false, start: DateTime(2023, 10, 16, 9, 0)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: TransactionCard(
+                      inprogress: false, start: DateTime(2023, 10, 16, 9, 0)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: TransactionCard(
+                      inprogress: false, start: DateTime(2023, 10, 16, 9, 0)),
+                )
               ],
             ),
           ]),
