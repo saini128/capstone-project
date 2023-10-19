@@ -200,7 +200,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     children: [
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
-                        child: Text('Hushraj Singh',
+                        child: Text('Jatin',
                             style: TextStyle(
                               fontFamily: 'Outfit',
                               color: kPrimaryColor,
@@ -254,7 +254,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Due: \$100.00', // Replace with your actual amount due
+                              'Due: \u{20B9}45.00', // Replace with your actual amount due
                               style: TextStyle(
                                 fontSize: 25,
                                 color: Colors.black,
@@ -354,28 +354,23 @@ class _DashboardPageState extends State<DashboardPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: TransactionCard(
-                      inprogress: false, start: DateTime(2023, 10, 16, 9, 0)),
+                      color: !_dataFetched || _scanning
+                          ? widget.overlayColor.withOpacity(widget.opacity)
+                          : Color.fromARGB(255, 244, 233, 255),
+                      inprogress: widget.isRentingCycle,
+                      start: DateTime(2023, 10, 16, 9, 0),
+                      end: DateTime.now()),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: TransactionCard(
-                      inprogress: false, start: DateTime(2023, 10, 16, 9, 0)),
+                      color: !_dataFetched || _scanning
+                          ? widget.overlayColor.withOpacity(widget.opacity)
+                          : Color.fromARGB(255, 244, 233, 255),
+                      inprogress: false,
+                      start: DateTime(2023, 10, 16, 9, 0),
+                      end: DateTime(2023, 10, 16, 9, 15)),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: TransactionCard(
-                      inprogress: false, start: DateTime(2023, 10, 16, 9, 0)),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: TransactionCard(
-                      inprogress: false, start: DateTime(2023, 10, 16, 9, 0)),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: TransactionCard(
-                      inprogress: false, start: DateTime(2023, 10, 16, 9, 0)),
-                )
               ],
             ),
           ]),
