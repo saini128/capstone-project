@@ -7,11 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:client_app/transactions_data.dart';
 
 // ignore: must_be_immutable
 class DashboardPage extends StatefulWidget {
   final String name;
-  int dueAmount;
+  double dueAmount;
   bool isRentingCycle;
   final Color overlayColor;
   final double opacity;
@@ -33,6 +34,8 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   //String _scanBarcode = 'Unknown';
+  database db = database();
+
   bool _dataFetched = false;
   bool _scanning = false;
 
@@ -41,6 +44,7 @@ class _DashboardPageState extends State<DashboardPage> {
     super.initState();
     // Fetch the initial renting status when the widget is initialized
     getInitialRentingStatus();
+    db.createInitialData();
   }
 
   Future<void> getInitialRentingStatus() async {
@@ -106,11 +110,12 @@ class _DashboardPageState extends State<DashboardPage> {
       if (response.statusCode == 200) {
         print('Data sent to ThingSpeak: ${!widget.isRentingCycle}');
         setState(() {
-          widget.isRentingCycle =
-              !widget.isRentingCycle; // Update the isRentingCycle
+          widget.isRentingCycle = !widget.isRentingCycle;
+          _scanning = false; // Update the isRentingCycle
         });
       } else {
         print('Failed to send data to ThingSpeak');
+        _scanning = false;
       }
     } else
       print('wrong QR');
@@ -124,256 +129,274 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromARGB(255, 241, 244, 248),
-      key: _scaffoldKey,
-      appBar: AppBar(
+    return WillPopScope(
+      onWillPop: () async {
+        if (Navigator.of(context).userGestureInProgress) {
+          SystemNavigator.pop();
+        }
+        return false;
+      },
+      child: Scaffold(
         backgroundColor: Color.fromARGB(255, 241, 244, 248),
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.menu,
-            color: Colors.black,
+        key: _scaffoldKey,
+        appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 241, 244, 248),
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.menu,
+              color: Colors.black,
+            ),
+            onPressed: openDrawer,
           ),
-          onPressed: openDrawer,
         ),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            ListTile(
-              title: Text("Menu Item 1"),
-              onTap: () {
-                // Handle menu item 1 click
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text("Menu Item 2"),
-              onTap: () {
-                // Handle menu item 2 click
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-      body: SafeArea(
-        top: true,
-        child: SingleChildScrollView(
-          child: Stack(children: <Widget>[
-            if (!_dataFetched || _scanning)
-              Container(
-                alignment: Alignment.center,
-                height: 600,
-                color: widget.overlayColor.withOpacity(widget.opacity),
-                child: Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                        widget.progressIndicatorColor),
-                  ),
-                ),
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              ListTile(
+                title: Text("Menu Item 1"),
+                onTap: () {
+                  // Handle menu item 1 click
+                  Navigator.pop(context);
+                },
               ),
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                const Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
-                        child: Text(
-                          'Welcome,',
-                          style: TextStyle(
-                              fontSize: 32, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ],
+              ListTile(
+                title: Text("Menu Item 2"),
+                onTap: () {
+                  // Handle menu item 2 click
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ),
+        body: SafeArea(
+          top: true,
+          child: SingleChildScrollView(
+            child: Stack(children: <Widget>[
+              if (!_dataFetched || _scanning)
+                Container(
+                  alignment: Alignment.center,
+                  height: 600,
+                  color: widget.overlayColor.withOpacity(widget.opacity),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          widget.progressIndicatorColor),
+                    ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
-                        child: Text('Jatin',
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  const Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 16, 0, 0),
+                          child: Text(
+                            'Welcome,',
                             style: TextStyle(
-                              fontFamily: 'Outfit',
-                              color: kPrimaryColor,
-                              fontSize: 48,
-                              fontWeight: FontWeight.w700,
-                            )),
-                      ),
-                    ],
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Icon(
-                        Icons.pin_drop,
-                        color: Color.fromARGB(255, 63, 63, 63),
-                      ),
-                      Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(8, 8, 8, 8),
-                        child: Text(
-                          'Patiala, Punjab',
-                          style: TextStyle(
-                              color: Color.fromARGB(255, 63, 63, 63),
-                              fontSize: 20),
+                                fontSize: 32, fontWeight: FontWeight.w500),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Card(
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      color: !_dataFetched || _scanning
-                          ? widget.overlayColor.withOpacity(widget.opacity)
-                          : Color.fromARGB(255, 244, 244, 244),
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Due: \u{20B9}45.00', // Replace with your actual amount due
+                  Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                          child: Text('Jatin',
                               style: TextStyle(
-                                fontSize: 25,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            Container(
-                              width: 300,
-                              child: Text(
-                                (widget.isRentingCycle
-                                    ? 'Cycle Status: Rented'
-                                    : 'Cycle Status: Not Rented'), // Replace with your actual cycle status
+                                fontFamily: 'Outfit',
+                                color: kPrimaryColor,
+                                fontSize: 48,
+                                fontWeight: FontWeight.w700,
+                              )),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Icon(
+                          Icons.pin_drop,
+                          color: Color.fromARGB(255, 63, 63, 63),
+                        ),
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(8, 8, 8, 8),
+                          child: Text(
+                            'Patiala, Punjab',
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 63, 63, 63),
+                                fontSize: 20),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Card(
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        color: !_dataFetched || _scanning
+                            ? widget.overlayColor.withOpacity(widget.opacity)
+                            : Color.fromARGB(255, 244, 244, 244),
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Due: \u{20B9}' +
+                                    widget.dueAmount
+                                        .toString(), // Replace with your actual amount due
                                 style: TextStyle(
                                   fontSize: 25,
                                   color: Colors.black,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          scanQR();
-                          _scanning = true;
-                          //setState(() {});
-                        },
-                        child: Card(
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          // color: Color.fromARGB(255, 244, 244, 244),
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Container(
-                            height: 70,
-                            width: 70,
-                            color: !_dataFetched || _scanning
-                                ? widget.overlayColor
-                                    .withOpacity(widget.opacity)
-                                : Color.fromARGB(255, 244, 233, 255),
-                            child: Padding(
-                              padding: const EdgeInsets.all(14.0),
-                              child: SvgPicture.asset("assets/images/qr.svg"),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 50),
-                      GestureDetector(
-                        onTap: () {
-                          getInitialRentingStatus();
-                          setState(() {});
-                        },
-                        child: Card(
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          // color: Color.fromARGB(255, 244, 244, 244),
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Container(
-                            height: 70,
-                            width: 70,
-                            color: !_dataFetched || _scanning
-                                ? widget.overlayColor
-                                    .withOpacity(widget.opacity)
-                                : Color.fromARGB(255, 244, 233, 255),
-                            child: Padding(
-                              padding: const EdgeInsets.all(14.0),
-                              child:
-                                  SvgPicture.asset("assets/images/rupee.svg"),
-                            ),
+                              SizedBox(height: 20),
+                              Container(
+                                width: 300,
+                                child: Text(
+                                  (widget.isRentingCycle
+                                      ? 'Cycle Status: Rented'
+                                      : 'Cycle Status: Not Rented'), // Replace with your actual cycle status
+                                  style: TextStyle(
+                                    fontSize: 25,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ],
                   ),
-                ),
-                Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    child: Container(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Ride Details',
-                          style: TextStyle(
-                              fontSize: 32, fontWeight: FontWeight.w500),
-                        ))),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: TransactionCard(
-                      color: !_dataFetched || _scanning
-                          ? widget.overlayColor.withOpacity(widget.opacity)
-                          : Color.fromARGB(255, 244, 233, 255),
-                      inprogress: widget.isRentingCycle,
-                      start: DateTime(2023, 10, 16, 9, 0),
-                      end: DateTime.now()),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: TransactionCard(
-                      color: !_dataFetched || _scanning
-                          ? widget.overlayColor.withOpacity(widget.opacity)
-                          : Color.fromARGB(255, 244, 233, 255),
-                      inprogress: false,
-                      start: DateTime(2023, 10, 16, 9, 0),
-                      end: DateTime(2023, 10, 16, 9, 15)),
-                ),
-              ],
-            ),
-          ]),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            if (widget.dueAmount == 0 ||
+                                widget.isRentingCycle) {
+                              scanQR();
+                              _scanning = true;
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text(
+                                    "Pay previous dues before renting again"),
+                                duration: Duration(seconds: 2),
+                              ));
+                            }
+                            //setState(() {});
+                          },
+                          child: Card(
+                            clipBehavior: Clip.antiAliasWithSaveLayer,
+                            // color: Color.fromARGB(255, 244, 244, 244),
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Container(
+                              height: 70,
+                              width: 70,
+                              color: !_dataFetched || _scanning
+                                  ? widget.overlayColor
+                                      .withOpacity(widget.opacity)
+                                  : Color.fromARGB(255, 244, 233, 255),
+                              child: Padding(
+                                padding: const EdgeInsets.all(14.0),
+                                child: SvgPicture.asset("assets/images/qr.svg"),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 50),
+                        GestureDetector(
+                          onTap: () {
+                            getInitialRentingStatus();
+                            widget.dueAmount = 0.0;
+                            setState(() {});
+                          },
+                          child: Card(
+                            clipBehavior: Clip.antiAliasWithSaveLayer,
+                            // color: Color.fromARGB(255, 244, 244, 244),
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Container(
+                              height: 70,
+                              width: 70,
+                              color: !_dataFetched || _scanning
+                                  ? widget.overlayColor
+                                      .withOpacity(widget.opacity)
+                                  : Color.fromARGB(255, 244, 233, 255),
+                              child: Padding(
+                                padding: const EdgeInsets.all(14.0),
+                                child:
+                                    SvgPicture.asset("assets/images/rupee.svg"),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      child: Container(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Ride Details',
+                            style: TextStyle(
+                                fontSize: 32, fontWeight: FontWeight.w500),
+                          ))),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: db.TransactionDatas.length,
+                        itemBuilder: (context, index) {
+                          return TransactionCard(
+                            datam: db.TransactionDatas[index],
+                            color: !_dataFetched || _scanning
+                                ? widget.overlayColor
+                                    .withOpacity(widget.opacity)
+                                : Color.fromARGB(255, 244, 233, 255),
+                          );
+                        },
+                      ))
+                ],
+              ),
+            ]),
+          ),
         ),
       ),
     );

@@ -81,7 +81,7 @@ class _LoginFormState extends State<LoginForm> {
                       builder: (context) {
                         return DashboardPage(
                           name: 'Hushraj Singh',
-                          dueAmount: 4500,
+                          dueAmount: 45.0,
                         );
                       },
                     ),
@@ -90,6 +90,17 @@ class _LoginFormState extends State<LoginForm> {
                   setState(() {
                     ifWrong = true; // Display error message
                   });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return DashboardPage(
+                          name: 'Hushraj Singh',
+                          dueAmount: 45.0,
+                        );
+                      },
+                    ),
+                  );
                 }
               },
               child: Text(
