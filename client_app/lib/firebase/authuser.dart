@@ -9,25 +9,13 @@ class AuthServices {
   static signupUser(
       String email, String password, String name, BuildContext context) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
+      await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-
-      await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
-      await FirebaseAuth.instance.currentUser!.updateEmail(email);
-      await FirestoreServices.saveUser(name, email, userCredential.user!.uid);
+      addNewUser(email, name, 0.0);
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Registration Successful')));
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Password Provided is too weak')));
-      } else if (e.code == 'email-already-in-use') {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Email Provided already Exists')));
-      }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
+      print(e);
     }
   }
 
@@ -64,14 +52,8 @@ class AuthServices {
         );
       } else
         print('no user');
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('No user Found with this Email')));
-      } else if (e.code == 'wrong-password') {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Password did not match')));
-      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -92,6 +74,25 @@ class AuthServices {
     } catch (e) {
       print('Error fetching document: $e');
       return null;
+    }
+  }
+
+  static Future<void> addNewUser(
+      String email, String name, double amount) async {
+    try {
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+
+      // Add a new document with auto-generated ID
+      await users.add({
+        'email': email,
+        'name': name,
+        'amount': amount,
+      });
+
+      print('New user added successfully.');
+    } catch (e) {
+      print('Error adding new user: $e');
     }
   }
 }

@@ -30,7 +30,7 @@ class _SignUpFormState extends State<SignUpForm> {
         children: [
           TextFormField(
             textInputAction: TextInputAction.done,
-            obscureText: true,
+            //obscureText: true,
             controller: nameController,
             cursorColor: kPrimaryColor,
             onSaved: (nm) {
@@ -94,19 +94,6 @@ class _SignUpFormState extends State<SignUpForm> {
             child: Text("Sign Up".toUpperCase()),
           ),
           const SizedBox(height: defaultPadding),
-          AlreadyHaveAnAccountCheck(
-            login: false,
-            press: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return LoginScreen();
-                  },
-                ),
-              );
-            },
-          ),
         ],
       ),
     );
