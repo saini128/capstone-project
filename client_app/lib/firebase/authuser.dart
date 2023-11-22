@@ -16,10 +16,33 @@ class AuthServices {
           .showSnackBar(SnackBar(content: Text('Registration Successful')));
     } catch (e) {
       print(e);
+      String error = extractErrorMessage(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $error'),
+        duration: Duration(seconds: 2),
+      ));
     }
   }
 
+  static extractErrorMessage(String error) {
+    // Find the index of the closing square bracket
+    int bracketIndex = error.indexOf(']');
+
+    // If the closing square bracket is found, extract the substring after it
+    // Otherwise, return the original error string
+    return bracketIndex != -1
+        ? error.substring(bracketIndex + 1).trim()
+        : error;
+  }
+
   static signinUser(String email, String password, BuildContext context) async {
+    if (!email.contains('@') && !email.contains('.')) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Invalid Email id format'),
+        duration: Duration(seconds: 2),
+      ));
+      return;
+    }
     try {
       print(email);
       print(password);
@@ -36,24 +59,29 @@ class AuthServices {
         if (userDetails != null) {
           name = userDetails['name'];
           dueAmount = userDetails['amount'].toDouble();
-          // ... (rest of the code)
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return DashboardPage(
+                  user:
+                      UserData(email: email, name: name, dueAmount: dueAmount),
+                );
+              },
+            ),
+          );
         } else {
           print('User details not found.');
         } // userData['due'];
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return DashboardPage(
-                user: UserData(email: email, name: name, dueAmount: dueAmount),
-              );
-            },
-          ),
-        );
       } else
         print('no user');
     } catch (e) {
       print(e);
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Wrong Credentials'),
+        duration: Duration(seconds: 2),
+      ));
     }
   }
 
