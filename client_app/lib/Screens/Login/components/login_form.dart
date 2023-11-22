@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import '../../../components/already_have_an_account_acheck.dart';
 import '../../../constants.dart';
 import '../../Signup/signup_screen.dart';
-import 'package:client_app/user_model.dart';
+//import 'package:client_app/user_model.dart';
+import 'package:client_app/firebase/authuser.dart';
 
 class LoginForm extends StatefulWidget {
   LoginForm({
@@ -18,11 +19,13 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   bool ifWrong = false;
 
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: _formKey,
       child: Column(
         children: [
           TextFormField(
@@ -30,7 +33,6 @@ class _LoginFormState extends State<LoginForm> {
             controller: emailController,
             textInputAction: TextInputAction.next,
             cursorColor: kPrimaryColor,
-            onSaved: (email) {},
             decoration: InputDecoration(
               hintText: "Email ID/Phone Number",
               prefixIcon: Padding(
@@ -68,39 +70,32 @@ class _LoginFormState extends State<LoginForm> {
           Hero(
             tag: "login_btn",
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () //async
+                  {
                 String email = emailController.text;
                 String password = passwordController.text;
-                if (email == "abc@thapar.edu" && password == "12345") {
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
                   setState(() {
                     ifWrong = false; // Reset the error message
                   });
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return DashboardPage(
-                          name: 'Hushraj Singh',
-                          dueAmount: 45.0,
-                        );
-                      },
-                    ),
-                  );
+                  print('ethe tk pahunch gea');
+                  AuthServices.signinUser(email, password, context);
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) {
+                  //       return DashboardPage(
+                  //         name: "Jatin",
+                  //         dueAmount: 45.0,
+                  //       );
+                  //     },
+                  //   ),
+                  // );
                 } else {
                   setState(() {
                     ifWrong = true; // Display error message
                   });
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return DashboardPage(
-                          name: 'Hushraj Singh',
-                          dueAmount: 45.0,
-                        );
-                      },
-                    ),
-                  );
                 }
               },
               child: Text(

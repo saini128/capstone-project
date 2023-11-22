@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:client_app/Screens/Login/login_screen.dart';
 import 'package:client_app/components/transaction_card.dart';
 import 'package:client_app/constants.dart';
+import 'package:client_app/firebase/firebasefunction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -9,10 +11,12 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:client_app/transactions_data.dart';
 
+import '../../components/user.dart';
+
 // ignore: must_be_immutable
 class DashboardPage extends StatefulWidget {
-  final String name;
-  double dueAmount;
+  UserData user;
+
   bool isRentingCycle;
   final Color overlayColor;
   final double opacity;
@@ -20,8 +24,7 @@ class DashboardPage extends StatefulWidget {
 
   DashboardPage({
     Key? key,
-    required this.name,
-    required this.dueAmount,
+    required this.user,
     this.isRentingCycle = false,
     this.overlayColor = Colors.grey,
     this.opacity = 0.7,
@@ -74,6 +77,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<void> scanQR() async {
     String barcodeScanRes;
+
     //if (!_scanning) return; // Avoid multiple scan attempts
     //await Future.delayed(Duration(seconds: 2));
 
@@ -111,6 +115,20 @@ class _DashboardPageState extends State<DashboardPage> {
         print('Data sent to ThingSpeak: ${!widget.isRentingCycle}');
         setState(() {
           widget.isRentingCycle = !widget.isRentingCycle;
+          if (widget.isRentingCycle) {
+            db.TransactionDatas.insert(
+                0, TransactionData(DateTime.now(), DateTime.now(), true, 0.0));
+          } else {
+            db.TransactionDatas[0].endTime = DateTime.now();
+            db.TransactionDatas[0].isOngoing = false;
+            db.TransactionDatas[0].finalAmount = 0.5 *
+                db.TransactionDatas[0].endTime
+                    .difference(db.TransactionDatas[0].startTime)
+                    .inMinutes;
+            widget.user.dueAmount = db.TransactionDatas[0].finalAmount;
+            FirestoreServices.updateDueAmount(
+                widget.user.email, widget.user.dueAmount);
+          }
           _scanning = false; // Update the isRentingCycle
         });
       } else {
@@ -154,17 +172,18 @@ class _DashboardPageState extends State<DashboardPage> {
           child: ListView(
             children: [
               ListTile(
-                title: Text("Menu Item 1"),
+                title: Text("Sign out"),
+                leading: Icon(Icons.power_settings_new),
                 onTap: () {
                   // Handle menu item 1 click
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: Text("Menu Item 2"),
-                onTap: () {
-                  // Handle menu item 2 click
-                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return LoginScreen();
+                      },
+                    ),
+                  );
                 },
               ),
             ],
@@ -212,7 +231,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       children: [
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
-                          child: Text('Jatin',
+                          child: Text(widget.user.name,
                               style: TextStyle(
                                 fontFamily: 'Outfit',
                                 color: kPrimaryColor,
@@ -267,7 +286,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             children: [
                               Text(
                                 'Due: \u{20B9}' +
-                                    widget.dueAmount
+                                    widget.user.dueAmount
                                         .toString(), // Replace with your actual amount due
                                 style: TextStyle(
                                   fontSize: 25,
@@ -300,7 +319,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            if (widget.dueAmount == 0 ||
+                            if (widget.user.dueAmount == 0 ||
                                 widget.isRentingCycle) {
                               scanQR();
                               _scanning = true;
@@ -339,7 +358,17 @@ class _DashboardPageState extends State<DashboardPage> {
                         GestureDetector(
                           onTap: () {
                             getInitialRentingStatus();
-                            widget.dueAmount = 0.0;
+                            if (!widget.isRentingCycle) {
+                              widget.user.dueAmount = 0.0;
+                              FirestoreServices.updateDueAmount(
+                                  widget.user.email, 0.0);
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text("Stop ride first"),
+                                duration: Duration(seconds: 2),
+                              ));
+                            }
                             setState(() {});
                           },
                           child: Card(
