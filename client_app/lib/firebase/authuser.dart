@@ -49,6 +49,7 @@ class AuthServices {
       final _auth = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email, password: password); // Map<String, dynamic>? userData =
       //     await FirestoreServices.getUserByEmail(email);
+
       User? user = _auth.user;
       print(user);
 

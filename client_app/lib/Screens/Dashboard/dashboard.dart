@@ -10,6 +10,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:client_app/transactions_data.dart';
+import 'package:client_app/paymentpage.dart';
 
 import '../../components/user.dart';
 
@@ -181,6 +182,21 @@ class _DashboardPageState extends State<DashboardPage> {
                     MaterialPageRoute(
                       builder: (context) {
                         return LoginScreen();
+                      },
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                title: Text("Payment"),
+                leading: Icon(Icons.payment),
+                onTap: () {
+                  // Handle menu item 1 click
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return PaymentPage(amount: 100);
                       },
                     ),
                   );
