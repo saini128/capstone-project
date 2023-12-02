@@ -36,20 +36,21 @@ class TransactionData {
 class Database {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> addTransaction(TransactionData transactionData) async {
+  Future<void> addTransaction(
+      TransactionData transactionData, String email) async {
     await _firestore
         .collection('users')
-        .doc('tarik@gmail.com')
+        .doc(email)
         .collection('transactions')
         .add(
           transactionData.toMap(),
         );
   }
 
-  Future<List<TransactionData>> getTransactions() async {
+  Future<List<TransactionData>> getTransactions(String email) async {
     final querySnapshot = await _firestore
         .collection('users')
-        .doc('tarik@gmail.com')
+        .doc(email)
         .collection('transactions')
         .get();
 
@@ -59,11 +60,11 @@ class Database {
         .toList();
   }
 
-  Future<void> updateTransaction(
-      String transactionId, TransactionData updatedTransaction) async {
+  Future<void> updateTransaction(String transactionId,
+      TransactionData updatedTransaction, String email) async {
     await _firestore
         .collection('users')
-        .doc('tarik@gmail.com')
+        .doc(email)
         .collection('transactions')
         .doc(transactionId)
         .update(
