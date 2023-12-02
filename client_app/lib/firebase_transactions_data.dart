@@ -58,4 +58,16 @@ class Database {
             TransactionData.fromMap(doc.data() as Map<String, dynamic>))
         .toList();
   }
+
+  Future<void> updateTransaction(
+      String transactionId, TransactionData updatedTransaction) async {
+    await _firestore
+        .collection('users')
+        .doc('tarik@gmail.com')
+        .collection('transactions')
+        .doc(transactionId)
+        .update(
+          updatedTransaction.toMap(),
+        );
+  }
 }
