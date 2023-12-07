@@ -1,7 +1,6 @@
 import 'package:client_app/Screens/Dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
 
-import '../../../components/already_have_an_account_acheck.dart';
 import '../../../constants.dart';
 import '../../Signup/signup_screen.dart';
 //import 'package:client_app/user_model.dart';
@@ -104,18 +103,6 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ),
           const SizedBox(height: defaultPadding),
-          AlreadyHaveAnAccountCheck(
-            press: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return SignUpScreen();
-                  },
-                ),
-              );
-            },
-          ),
         ],
       ),
     );
