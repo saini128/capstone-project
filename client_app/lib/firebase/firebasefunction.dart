@@ -25,6 +25,7 @@ class FirestoreServices {
       return null;
     }
   }
+  
 
   static Future<void> updateDueAmount(String email, double newDueAmount) async {
     try {
