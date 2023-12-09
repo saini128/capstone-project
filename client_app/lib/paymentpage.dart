@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 //import 'package:payment_sheet/payment_sheet.dart';
 
-
 class PaymentPage extends StatefulWidget {
   final double amount;
 
@@ -16,7 +15,8 @@ class _PaymentPageState extends State<PaymentPage> {
   @override
   void initState() {
     super.initState();
-    Stripe.publishableKey = 'your_publishable_key'; // Replace with your Stripe publishable key
+    Stripe.publishableKey =
+        'your_publishable_key'; // Replace with your Stripe publishable key
   }
 
   Future<void> _handleCardPayment() async {
@@ -33,7 +33,7 @@ class _PaymentPageState extends State<PaymentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Payment Page'),
+        title: Text('Payment Page6'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -60,16 +60,12 @@ class _PaymentPageState extends State<PaymentPage> {
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: () {
-                
-              },
+              onPressed: () {},
               child: Text('PhonePe'),
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: () {
-                
-              },
+              onPressed: () {},
               child: Text('Paytm'),
             ),
           ],

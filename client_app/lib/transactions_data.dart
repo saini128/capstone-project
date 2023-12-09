@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'firebase_transactions_data.dart';
 
 class TransactionData {
   DateTime startTime;
@@ -12,7 +13,7 @@ class TransactionData {
 
 class database {
   List<TransactionData> TransactionDatas = [];
-  void createInitialData() {
+  void createInitialData(String email) {
     TransactionDatas = [
       TransactionData(DateTime(2023, 10, 16, 9, 0),
           DateTime(2023, 10, 16, 10, 30), false, 45.0),
@@ -25,6 +26,8 @@ class database {
       TransactionData(DateTime(2023, 10, 20, 16, 30),
           DateTime(2023, 10, 20, 18, 0), false, 35.0),
     ];
+    // Database db = Database();
+    // TransactionDatas = db.getTransactions(email) as List<TransactionData>;
 
     for (TransactionData TransactionDatam in TransactionDatas) {
       TransactionDatam.finalAmount = 0.5 *

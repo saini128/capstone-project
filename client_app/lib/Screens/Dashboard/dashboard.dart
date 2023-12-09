@@ -4,13 +4,14 @@ import 'package:client_app/Screens/Login/login_screen.dart';
 import 'package:client_app/components/transaction_card.dart';
 import 'package:client_app/constants.dart';
 import 'package:client_app/firebase/firebasefunction.dart';
+import 'package:client_app/firebase_transactions_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:client_app/transactions_data.dart';
-import 'package:client_app/paymentpage.dart';
+// import 'package:client_app/paymentpage.dart';
 
 import '../../components/user.dart';
 
@@ -39,7 +40,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   //String _scanBarcode = 'Unknown';
   database db = database();
-
+  // Database ds = Database();
   bool _dataFetched = false;
   bool _scanning = false;
 
@@ -48,7 +49,7 @@ class _DashboardPageState extends State<DashboardPage> {
     super.initState();
     // Fetch the initial renting status when the widget is initialized
     getInitialRentingStatus();
-    db.createInitialData();
+    db.createInitialData(widget.user.email);
   }
 
   Future<void> getInitialRentingStatus() async {
@@ -182,21 +183,6 @@ class _DashboardPageState extends State<DashboardPage> {
                     MaterialPageRoute(
                       builder: (context) {
                         return LoginScreen();
-                      },
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                title: Text("Payment"),
-                leading: Icon(Icons.payment),
-                onTap: () {
-                  // Handle menu item 1 click
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return PaymentPage(amount: 100);
                       },
                     ),
                   );
@@ -378,6 +364,29 @@ class _DashboardPageState extends State<DashboardPage> {
                               widget.user.dueAmount = 0.0;
                               FirestoreServices.updateDueAmount(
                                   widget.user.email, 0.0);
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 255, 255, 255)
+                                            .withOpacity(0.8),
+                                    title: Text('Notice'),
+                                    content: Text(
+                                      'This is a development model. In the production model with a Business API, which is acquired by a GST number, this will be replaced by a popup that allows us to choose our preferred UPI app for payment.',
+                                    ),
+                                    actions: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .pop(); // Close the alert box
+                                        },
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             } else {
                               ScaffoldMessenger.of(context)
                                   .showSnackBar(const SnackBar(

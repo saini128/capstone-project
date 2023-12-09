@@ -1,15 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class TransactionData {
+class TransactionDatam {
   DateTime startTime;
   DateTime endTime;
   bool isOngoing;
   double finalAmount;
 
-  TransactionData(
+  TransactionDatam(
       this.startTime, this.endTime, this.isOngoing, this.finalAmount);
 
-  // Convert TransactionData to a Map for Firestore
+  // Convert TransactionDatam to a Map for Firestore
   Map<String, dynamic> toMap() {
     // Automatically calculate finalAmount before storing in Firestore
     finalAmount = 0.5 * endTime.difference(startTime).inMinutes.toDouble();
@@ -22,9 +22,9 @@ class TransactionData {
     };
   }
 
-  // Create a TransactionData object from Firestore data
-  factory TransactionData.fromMap(Map<String, dynamic> map) {
-    return TransactionData(
+  // Create a TransactionDatam object from Firestore data
+  factory TransactionDatam.fromMap(Map<String, dynamic> map) {
+    return TransactionDatam(
       (map['startTime'] as Timestamp).toDate(),
       (map['endTime'] as Timestamp).toDate(),
       map['isOngoing'] as bool,
@@ -37,17 +37,17 @@ class Database {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> addTransaction(
-      TransactionData transactionData, String email) async {
+      TransactionDatam TransactionDatam, String email) async {
     await _firestore
         .collection('users')
         .doc(email)
         .collection('transactions')
         .add(
-          transactionData.toMap(),
+          TransactionDatam.toMap(),
         );
   }
 
-  Future<List<TransactionData>> getTransactions(String email) async {
+  Future<List<TransactionDatam>> getTransactions(String email) async {
     final querySnapshot = await _firestore
         .collection('users')
         .doc(email)
@@ -56,12 +56,12 @@ class Database {
 
     return querySnapshot.docs
         .map((doc) =>
-            TransactionData.fromMap(doc.data() as Map<String, dynamic>))
+            TransactionDatam.fromMap(doc.data() as Map<String, dynamic>))
         .toList();
   }
 
   Future<void> updateTransaction(String transactionId,
-      TransactionData updatedTransaction, String email) async {
+      TransactionDatam updatedTransaction, String email) async {
     await _firestore
         .collection('users')
         .doc(email)
