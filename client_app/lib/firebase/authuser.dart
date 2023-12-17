@@ -6,12 +6,12 @@ import 'package:client_app/components/user.dart';
 import 'package:client_app/firebase/firebasefunction.dart';
 
 class AuthServices {
-  static signupUser(
-      String email, String password, String name, BuildContext context) async {
+  static signupUser(String email, String password, String name,
+      String selectedRole, String id, BuildContext context) async {
     try {
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      addNewUser(email, name, 0.0);
+      addNewUser(email, name, 0.0, selectedRole, id);
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Registration Successful')));
     } catch (e) {
@@ -109,8 +109,8 @@ class AuthServices {
     }
   }
 
-  static Future<void> addNewUser(
-      String email, String name, double amount) async {
+  static Future<void> addNewUser(String email, String name, double amount,
+      String selectedRole, String id) async {
     try {
       CollectionReference users =
           FirebaseFirestore.instance.collection('users');
@@ -120,6 +120,8 @@ class AuthServices {
         'email': email,
         'name': name,
         'amount': amount,
+        'role': selectedRole,
+        'id': id
       });
 
       print('New user added successfully.');
