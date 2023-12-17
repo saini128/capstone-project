@@ -44,13 +44,16 @@ class AuthServices {
       return;
     }
     try {
+      final _auth = await FirebaseAuth.instance;
+      await _auth.setPersistence(Persistence.LOCAL);
       print(email);
       print(password);
-      final _auth = await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email, password: password); // Map<String, dynamic>? userData =
+      // final _auth = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      //     email: email, password: password); // Map<String, dynamic>? userData =
       //     await FirestoreServices.getUserByEmail(email);
-
-      User? user = _auth.user;
+      final result = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      User? user = result.user;
       print(user);
 
       if (user != null) {

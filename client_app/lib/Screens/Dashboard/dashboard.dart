@@ -92,6 +92,12 @@ class _DashboardPageState extends State<DashboardPage> {
         true,
         ScanMode.QR,
       );
+      if (barcodeScanRes.isEmpty) {
+        // User pressed "Cancel"
+        _scanning = false;
+        setState(() {});
+        return;
+      }
       print(barcodeScanRes);
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
