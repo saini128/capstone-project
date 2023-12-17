@@ -2,12 +2,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBjw04ucDCn4DumKuKgk8jV3MF7z7yJ0Sk",
-  authDomain: "capstone-tarik.firebaseapp.com",
-  projectId: "capstone-tarik",
-  storageBucket: "capstone-tarik.appspot.com",
-  messagingSenderId: "192421180564",
-  appId: "1:192421180564:web:0eff5301f82bd79b6b7081"
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
 };
 
 
