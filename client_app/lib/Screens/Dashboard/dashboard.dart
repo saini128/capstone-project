@@ -11,6 +11,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:client_app/transactions_data.dart';
+import 'package:url_launcher/url_launcher.dart';
 // import 'package:client_app/paymentpage.dart';
 
 import '../../components/user.dart';
@@ -93,7 +94,12 @@ class _DashboardPageState extends State<DashboardPage> {
         ScanMode.QR,
       );
       if (barcodeScanRes.isEmpty) {
-        // User pressed "Cancel"
+        _scanning = false;
+        print("scanning is false");
+        setState(() {});
+      }
+      if (barcodeScanRes == '-1') {
+        print('Scan cancelled');
         _scanning = false;
         setState(() {});
         return;
@@ -175,22 +181,54 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             onPressed: openDrawer,
           ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return LoginScreen();
+                    },
+                  ),
+                );
+              },
+              icon: Icon(
+                Icons.power_settings_new,
+                color: Colors.black,
+              ),
+            )
+          ],
         ),
         drawer: Drawer(
           child: ListView(
             children: [
               ListTile(
-                title: Text("Sign out"),
-                leading: Icon(Icons.power_settings_new),
+                title: Text("About"),
+                leading: Icon(Icons.info),
                 onTap: () {
-                  // Handle menu item 1 click
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return LoginScreen();
-                      },
-                    ),
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        backgroundColor:
+                            const Color.fromARGB(255, 255, 255, 255)
+                                .withOpacity(0.8),
+                        title: Text('About'),
+                        content: Text(
+                          'This is a development model. In the production model with a Business API, which is acquired by a GST number, this will be replaced by a popup that allows us to choose our preferred UPI app for payment.',
+                        ),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(); // Close the alert box
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
                   );
                 },
               ),
@@ -243,7 +281,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               style: TextStyle(
                                 fontFamily: 'Outfit',
                                 color: kPrimaryColor,
-                                fontSize: 48,
+                                fontSize: 36,
                                 fontWeight: FontWeight.w700,
                               )),
                         ),
@@ -341,25 +379,36 @@ class _DashboardPageState extends State<DashboardPage> {
                             }
                             //setState(() {});
                           },
-                          child: Card(
-                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                            // color: Color.fromARGB(255, 244, 244, 244),
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Container(
-                              height: 70,
-                              width: 70,
-                              color: !_dataFetched || _scanning
-                                  ? widget.overlayColor
-                                      .withOpacity(widget.opacity)
-                                  : Color.fromARGB(255, 244, 233, 255),
-                              child: Padding(
-                                padding: const EdgeInsets.all(14.0),
-                                child: SvgPicture.asset("assets/images/qr.svg"),
+                          child: Column(
+                            children: [
+                              Card(
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
+                                // color: Color.fromARGB(255, 244, 244, 244),
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Container(
+                                  height: 70,
+                                  width: 70,
+                                  color: !_dataFetched || _scanning
+                                      ? widget.overlayColor
+                                          .withOpacity(widget.opacity)
+                                      : Color.fromARGB(255, 244, 233, 255),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(14.0),
+                                    child: SvgPicture.asset(
+                                        "assets/images/qr.svg"),
+                                  ),
+                                ),
                               ),
-                            ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(widget.isRentingCycle
+                                    ? 'Stop Ride'
+                                    : 'Book Ride'),
+                              )
+                            ],
                           ),
                         ),
                         SizedBox(width: 50),
@@ -383,9 +432,18 @@ class _DashboardPageState extends State<DashboardPage> {
                                     ),
                                     actions: [
                                       ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .pop(); // Close the alert box
+                                        onPressed: () async {
+                                          if (await canLaunchUrl(Uri.parse(
+                                            'https://pay.google.com/',
+                                          ))) {
+                                            await launchUrl(Uri.parse(
+                                              'https://pay.google.com/',
+                                            ));
+                                          } else {
+                                            // Handle the case where the user doesn't have Google Pay installed.
+                                            print(
+                                                'Could not launch Google Pay.');
+                                          } // Close the alert box
                                         },
                                         child: Text('OK'),
                                       ),
@@ -402,26 +460,34 @@ class _DashboardPageState extends State<DashboardPage> {
                             }
                             setState(() {});
                           },
-                          child: Card(
-                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                            // color: Color.fromARGB(255, 244, 244, 244),
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Container(
-                              height: 70,
-                              width: 70,
-                              color: !_dataFetched || _scanning
-                                  ? widget.overlayColor
-                                      .withOpacity(widget.opacity)
-                                  : Color.fromARGB(255, 244, 233, 255),
-                              child: Padding(
-                                padding: const EdgeInsets.all(14.0),
-                                child:
-                                    SvgPicture.asset("assets/images/rupee.svg"),
+                          child: Column(
+                            children: [
+                              Card(
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
+                                // color: Color.fromARGB(255, 244, 244, 244),
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Container(
+                                  height: 70,
+                                  width: 70,
+                                  color: !_dataFetched || _scanning
+                                      ? widget.overlayColor
+                                          .withOpacity(widget.opacity)
+                                      : Color.fromARGB(255, 244, 233, 255),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(14.0),
+                                    child: SvgPicture.asset(
+                                        "assets/images/rupee.svg"),
+                                  ),
+                                ),
                               ),
-                            ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('Pay Dues'),
+                              )
+                            ],
                           ),
                         ),
                       ],

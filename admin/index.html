@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <h1>Admin Panel</h1>
+
+    <div class="content">
+        <form id="add-cafe-form"></form>
+        <input type="text" id="search-input" placeholder="Search...">
+        <table id="cafe-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Name</th>
+                    <th onclick="sortTable(1)">Email</th>
+                    <th onclick="sortTable(2)">Phone Number</th>
+                    <th onclick="sortTable(3)">Role</th>
+                    <th onclick="sortTable(4)">Amount</th>
+                    <th onclick="sortTable(5)">ID</th>
+                </tr>
+            </thead>
+            <tbody id="cafe-list"></tbody>
+        </table>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -6,12 +6,18 @@ import 'package:client_app/components/user.dart';
 import 'package:client_app/firebase/firebasefunction.dart';
 
 class AuthServices {
-  static signupUser(String email, String password, String name,
-      String selectedRole, String id, BuildContext context) async {
+  static signupUser(
+      String email,
+      String password,
+      String name,
+      String selectedRole,
+      String id,
+      String phone,
+      BuildContext context) async {
     try {
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      addNewUser(email, name, 0.0, selectedRole, id);
+      addNewUser(email, name, 0.0, selectedRole, id, phone);
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Registration Successful')));
     } catch (e) {
@@ -45,12 +51,8 @@ class AuthServices {
     }
     try {
       final _auth = await FirebaseAuth.instance;
-      await _auth.setPersistence(Persistence.LOCAL);
       print(email);
       print(password);
-      // final _auth = await FirebaseAuth.instance.signInWithEmailAndPassword(
-      //     email: email, password: password); // Map<String, dynamic>? userData =
-      //     await FirestoreServices.getUserByEmail(email);
       final result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
@@ -81,7 +83,6 @@ class AuthServices {
         print('no user');
     } catch (e) {
       print(e);
-
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Wrong Credentials'),
         duration: Duration(seconds: 2),
@@ -110,18 +111,17 @@ class AuthServices {
   }
 
   static Future<void> addNewUser(String email, String name, double amount,
-      String selectedRole, String id) async {
+      String selectedRole, String id, String phone) async {
     try {
       CollectionReference users =
           FirebaseFirestore.instance.collection('users');
-
-      // Add a new document with auto-generated ID
       await users.add({
         'email': email,
         'name': name,
         'amount': amount,
         'role': selectedRole,
-        'id': id
+        'id': id,
+        'phone': phone
       });
 
       print('New user added successfully.');
