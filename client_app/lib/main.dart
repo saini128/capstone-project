@@ -10,12 +10,12 @@ void main() async {
   try {
     await Firebase.initializeApp(
         options: const FirebaseOptions(
-      apiKey: "AIzaSyDNvzdDM7tBm1hc3j0tbZPJ4o8id6wsMtQ",
-      appId: "1:192421180564:android:40dd327e40f08bd06b7081",
-      messagingSenderId: "192421180564",
-      projectId: "capstone-tarik",
-      authDomain: "capstone-tarik.firebaseapp.com",
-      storageBucket: "capstone-tarik.appspot.com",
+      apiKey: "",
+      appId: "",
+      messagingSenderId: "",
+      projectId: "",
+      authDomain: "",
+      storageBucket: "",
     ));
   } catch (e) {
     print("Firebase initialization error: $e");
