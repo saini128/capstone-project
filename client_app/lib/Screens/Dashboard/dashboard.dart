@@ -1,18 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:client_app/Screens/Login/login_screen.dart';
-import 'package:client_app/components/transaction_card.dart';
-import 'package:client_app/constants.dart';
-import 'package:client_app/firebase/firebasefunction.dart';
-import 'package:client_app/firebase_transactions_data.dart';
+import 'package:SCKARS/Screens/Login/login_screen.dart';
+import 'package:SCKARS/components/transaction_card.dart';
+import 'package:SCKARS/constants.dart';
+import 'package:SCKARS/firebase/firebasefunction.dart';
+import 'package:SCKARS/firebase_transactions_data.dart';
+import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:client_app/transactions_data.dart';
+import 'package:SCKARS/transactions_data.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import 'package:client_app/paymentpage.dart';
+// import 'package:SCKARS/paymentpage.dart';
 
 import '../../components/user.dart';
 
@@ -174,13 +175,7 @@ class _DashboardPageState extends State<DashboardPage> {
         appBar: AppBar(
           backgroundColor: Color.fromARGB(255, 241, 244, 248),
           elevation: 0,
-          leading: IconButton(
-            icon: Icon(
-              Icons.menu,
-              color: Colors.black,
-            ),
-            onPressed: openDrawer,
-          ),
+          automaticallyImplyLeading: false,
           actions: [
             IconButton(
               onPressed: () {
@@ -199,41 +194,6 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             )
           ],
-        ),
-        drawer: Drawer(
-          child: ListView(
-            children: [
-              ListTile(
-                title: Text("About"),
-                leading: Icon(Icons.info),
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        backgroundColor:
-                            const Color.fromARGB(255, 255, 255, 255)
-                                .withOpacity(0.8),
-                        title: Text('About'),
-                        content: Text(
-                          'This is a development model. In the production model with a Business API, which is acquired by a GST number, this will be replaced by a popup that allows us to choose our preferred UPI app for payment.',
-                        ),
-                        actions: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(); // Close the alert box
-                            },
-                            child: Text('OK'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
         ),
         body: SafeArea(
           top: true,
@@ -433,19 +393,12 @@ class _DashboardPageState extends State<DashboardPage> {
                                     actions: [
                                       ElevatedButton(
                                         onPressed: () async {
-                                          if (await canLaunchUrl(Uri.parse(
-                                            'https://pay.google.com/',
-                                          ))) {
-                                            await launchUrl(Uri.parse(
-                                              'https://pay.google.com/',
-                                            ));
-                                          } else {
-                                            // Handle the case where the user doesn't have Google Pay installed.
-                                            print(
-                                                'Could not launch Google Pay.');
-                                          } // Close the alert box
+                                          await LaunchApp.openApp(
+                                            androidPackageName:
+                                                'com.google.android.apps.nbu.paisa.user',
+                                          ); // Close the alert box
                                         },
-                                        child: Text('OK'),
+                                        child: Text('Open Google Pay'),
                                       ),
                                     ],
                                   );

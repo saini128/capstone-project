@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:client_app/responsive.dart';
+import 'package:SCKARS/responsive.dart';
 
 import '../../components/background.dart';
 import 'components/login_form.dart';
@@ -26,7 +26,8 @@ class MobileLoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
-        //mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           const LoginScreenTopImage(),
           //Spacer(),

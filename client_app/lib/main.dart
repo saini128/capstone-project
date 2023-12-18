@@ -1,8 +1,8 @@
-import 'package:client_app/Screens/Dashboard/dashboard.dart';
+import 'package:SCKARS/Screens/Dashboard/dashboard.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:client_app/Screens/Welcome/welcome_screen.dart';
-import 'package:client_app/constants.dart';
+import 'package:SCKARS/Screens/Welcome/welcome_screen.dart';
+import 'package:SCKARS/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {

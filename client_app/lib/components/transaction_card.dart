@@ -1,5 +1,4 @@
-import 'package:client_app/Screens/Dashboard/maps.dart';
-import 'package:client_app/transactions_data.dart';
+import 'package:SCKARS/transactions_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -36,14 +35,14 @@ class _TransactionCardState extends State<TransactionCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return MapScreen();
-            },
-          ),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) {
+        //       return MapScreen();
+        //     },
+        //   ),
+        // );
       },
       child: Card(
         color: widget.color,

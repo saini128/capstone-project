@@ -1,10 +1,9 @@
-import 'package:client_app/Screens/Dashboard/dashboard.dart';
+import 'package:SCKARS/Screens/Dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
 import '../../Signup/signup_screen.dart';
-//import 'package:client_app/user_model.dart';
-import 'package:client_app/firebase/authuser.dart';
+import 'package:SCKARS/firebase/authuser.dart';
 
 class LoginForm extends StatefulWidget {
   LoginForm({
@@ -26,6 +25,8 @@ class _LoginFormState extends State<LoginForm> {
     return Form(
       key: _formKey,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           TextFormField(
             keyboardType: TextInputType.emailAddress,
@@ -103,6 +104,27 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ),
           const SizedBox(height: defaultPadding),
+          Align(
+            alignment: Alignment.center,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return SignUpScreen(); // Use the actual name of your signup screen class
+                    },
+                  ),
+                );
+              },
+              child: Text(
+                "Click to Register",
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

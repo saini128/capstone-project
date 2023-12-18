@@ -1,4 +1,5 @@
-import 'package:client_app/firebase/authuser.dart';
+import 'package:SCKARS/Screens/Signup/signup_screen.dart';
+import 'package:SCKARS/firebase/authuser.dart';
 import 'package:flutter/material.dart';
 
 import '../../../constants.dart';
@@ -23,6 +24,10 @@ class _SignUpFormState extends State<SignUpForm> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController idController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  bool isValidEmail(String email) {
+    return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        .hasMatch(email);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,14 +117,23 @@ class _SignUpFormState extends State<SignUpForm> {
                 DropdownMenuItem<String>(
                   value: 'student',
                   child: Text('Student'),
+                  onTap: () {
+                    setState(() {});
+                  },
                 ),
                 DropdownMenuItem<String>(
                   value: 'teacher',
                   child: Text('Teacher'),
+                  onTap: () {
+                    setState(() {});
+                  },
                 ),
                 DropdownMenuItem<String>(
                   value: 'guest',
                   child: Text('Guest'),
+                  onTap: () {
+                    setState(() {});
+                  },
                 ),
               ],
               decoration: InputDecoration(
@@ -156,6 +170,28 @@ class _SignUpFormState extends State<SignUpForm> {
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
+                if (phoneController.text.length != 10 ||
+                    int.parse(phoneController.text[0]) < 6) {
+                  // Show error for invalid phone number
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Invalid Phone Number'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                  return;
+                }
+
+                if (!isValidEmail(emailController.text)) {
+                  // Show error for invalid email
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Invalid Email Address'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                  return;
+                }
                 AuthServices.signupUser(email, password, name, selectedRole,
                     idController.text, phoneController.text, context);
                 // Clear form fields
@@ -198,7 +234,33 @@ class _SignUpFormState extends State<SignUpForm> {
             },
             child: Text("Sign Up".toUpperCase()),
           ),
-          const SizedBox(height: defaultPadding),
+          const SizedBox(height: defaultPadding * 3),
+          // GestureDetector(
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) {
+          //           return SignUpScreen(); // Use the actual name of your signup screen class
+          //         },
+          //       ),
+          //     );
+          //   },
+          //   child: Row(
+          //     children: [
+          //       Text(
+          //         "Don't have an account? ",
+          //       ),
+          //       Text(
+          //         "Register",
+          //         style: TextStyle(
+          //           color: Colors.blue, // You can customize the color
+          //           decoration: TextDecoration.underline,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );

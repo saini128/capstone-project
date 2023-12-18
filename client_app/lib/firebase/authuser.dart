@@ -1,9 +1,9 @@
-import 'package:client_app/Screens/Dashboard/dashboard.dart';
+import 'package:SCKARS/Screens/Dashboard/dashboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:client_app/components/user.dart';
-import 'package:client_app/firebase/firebasefunction.dart';
+import 'package:SCKARS/components/user.dart';
+import 'package:SCKARS/firebase/firebasefunction.dart';
 
 class AuthServices {
   static signupUser(
